@@ -1,4 +1,3 @@
-import fire
 import torch
 from cp_dataset_test import get_agnostic
 from test_generator import get_opt, remove_overlap, save_images, visualize_segmap, load_checkpoint_G
