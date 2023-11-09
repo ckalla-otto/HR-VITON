@@ -8,43 +8,7 @@ import os.path as osp
 import numpy as np
 import json
 
-
-class CPDatasetTest(data.Dataset):
-    """
-        Test Dataset for CP-VTON.
-    """
-    def __init__(self, opt):
-        super(CPDatasetTest, self).__init__()
-        # base setting
-        self.opt = opt
-        self.root = opt.dataroot
-        self.datamode = opt.datamode # train or test or self-defined
-        self.data_list = opt.data_list
-        self.fine_height = opt.fine_height
-        self.fine_width = opt.fine_width
-        self.semantic_nc = opt.semantic_nc
-        self.data_path = osp.join(opt.dataroot, opt.datamode)
-        self.transform = transforms.Compose([  \
-                transforms.ToTensor(),   \
-                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
-        # load data list
-        im_names = []
-        c_names = []
-        with open(osp.join(opt.dataroot, opt.data_list), 'r') as f:
-            for line in f.readlines():
-                im_name, c_name = line.strip().split()
-                im_names.append(im_name)
-                c_names.append(c_name)
-
-        self.im_names = im_names
-        self.c_names = dict()
-        self.c_names['paired'] = im_names
-        self.c_names['unpaired'] = c_names
-
-    def name(self):
-        return "CPDataset"
-    def get_agnostic(self, im, im_parse, pose_data):
+def get_agnostic(im, im_parse, pose_data):
         parse_array = np.array(im_parse)
         parse_head = ((parse_array == 4).astype(np.float32) +
                       (parse_array == 13).astype(np.float32))
@@ -111,6 +75,43 @@ class CPDatasetTest(data.Dataset):
         agnostic.paste(im, None, Image.fromarray(np.uint8(parse_head * 255), 'L'))
         agnostic.paste(im, None, Image.fromarray(np.uint8(parse_lower * 255), 'L'))
         return agnostic
+
+class CPDatasetTest(data.Dataset):
+    """
+        Test Dataset for CP-VTON.
+    """
+    def __init__(self, opt):
+        super(CPDatasetTest, self).__init__()
+        # base setting
+        self.opt = opt
+        self.root = opt.dataroot
+        self.datamode = opt.datamode # train or test or self-defined
+        self.data_list = opt.data_list
+        self.fine_height = opt.fine_height
+        self.fine_width = opt.fine_width
+        self.semantic_nc = opt.semantic_nc
+        self.data_path = osp.join(opt.dataroot, opt.datamode)
+        self.transform = transforms.Compose([  \
+                transforms.ToTensor(),   \
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+        # load data list
+        im_names = []
+        c_names = []
+        with open(osp.join(opt.dataroot, opt.data_list), 'r') as f:
+            for line in f.readlines():
+                im_name, c_name = line.strip().split()
+                im_names.append(im_name)
+                c_names.append(c_name)
+
+        self.im_names = im_names
+        self.c_names = dict()
+        self.c_names['paired'] = im_names
+        self.c_names['unpaired'] = c_names
+
+    def name(self):
+        return "CPDataset"
+    
     def __getitem__(self, index):
         im_name = self.im_names[index]
         c_name = {}
