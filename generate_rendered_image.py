@@ -266,13 +266,6 @@ def main():
         
 
         output = generator(torch.cat((agnostic, densepose, warped_cloth), dim=1), parse)
-        # visualize
-        unpaired_names = []
-        grid_dir="grid"
-        output_dir="output"
-        os.makedirs(grid_dir, exist_ok=True)
-        os.makedirs(output_dir, exist_ok=True)
-        
         save_tensor_to_image(output[0], "rendered_image.jpg")
     
 
